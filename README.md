@@ -161,6 +161,23 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 API will be available at `http://localhost:8000`  
 Interactive docs at `http://localhost:8000/docs`
 
+### Alternative: Running with Docker
+
+1.  **Configure Environment Variables**:
+    Ensure your `.env` file is set up as described in **Step 4**.
+
+2.  **Start Services**:
+
+    ```bash
+    docker-compose up -d --build
+    ```
+
+    This automatically runs migrations and starts the application.
+
+3.  **Access the Application**:
+    - API: `http://localhost:8000`
+    - Swagger Docs: `http://localhost:8000/docs`
+
 ---
 
 ## API Endpoints Overview
