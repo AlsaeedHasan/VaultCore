@@ -78,6 +78,7 @@ class UserResponse(User):
             return [user_role.role_id for user_role in v]
         return v
 
+
 class ChangePasswordRequest(BaseModel):
     old_password: str = Field(min_length=8, max_length=16)
     new_password: str = Field(min_length=8, max_length=16)
@@ -89,6 +90,7 @@ class ChangePasswordRequest(BaseModel):
         if info.data.get("new_password") and v != info.data["new_password"]:
             raise ValueError("New passwords do not match")
         return v
+
 
 class PasswordResetRequest(BaseModel):
     email: EmailStr

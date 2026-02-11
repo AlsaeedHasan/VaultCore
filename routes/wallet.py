@@ -9,9 +9,10 @@ from services import WalletService
 
 router = APIRouter(prefix="/api/v1/wallets", tags=["Wallets"])
 
+
 @router.post(
-    "/", 
-    response_model=schemas.WalletResponse, 
+    "/",
+    response_model=schemas.WalletResponse,
     status_code=status.HTTP_201_CREATED,
 )
 def create_wallet(
@@ -20,12 +21,14 @@ def create_wallet(
     current_user: schemas.UserResponse = Depends(oauth2.get_current_active_user),
 ):
     wallet_service = WalletService(db)
-    return wallet_service.create_wallet(user_id=current_user.id, wallet_data=wallet_data)
+    return wallet_service.create_wallet(
+        user_id=current_user.id, wallet_data=wallet_data
+    )
 
 
 @router.get(
-    "/", 
-    response_model=List[schemas.WalletResponse], 
+    "/",
+    response_model=List[schemas.WalletResponse],
     status_code=status.HTTP_200_OK,
 )
 def get_my_wallets(
@@ -37,8 +40,8 @@ def get_my_wallets(
 
 
 @router.get(
-    "/{currency}", 
-    response_model=schemas.WalletResponse, 
+    "/{currency}",
+    response_model=schemas.WalletResponse,
     status_code=status.HTTP_200_OK,
 )
 def get_wallet(
