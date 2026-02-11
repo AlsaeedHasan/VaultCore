@@ -3,7 +3,6 @@ from datetime import datetime, timedelta, timezone
 
 from fastapi import (
     APIRouter,
-    BackgroundTasks,
     Cookie,
     Depends,
     HTTPException,
@@ -13,7 +12,6 @@ from fastapi import (
     status,
 )
 from fastapi.security import OAuth2PasswordRequestForm
-from pydantic import EmailStr
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
@@ -22,6 +20,7 @@ import oauth2
 import schemas
 import utils
 from database import get_db
+from worker import start_sending_email
 
 router = APIRouter(
     prefix="/api/v1/auth",
@@ -240,25 +239,20 @@ async def verify_email(
         )
         db.add(db_token)
 
-        with open("mail_templates/verification_mail.html", "r") as template:
-            asyncio.create_task(
-                utils.send_email(
-                    "Email Verification",
-                    recipients=[current_user.email],
-                    body=template.read().replace(
-                        "{verification_url}", verification_url._url
-                    ),
-                )
-            )
+        task = start_sending_email.delay(
+            "Email Verification",
+            [current_user.email],
+            verification_url._url,
+        )
 
         db.commit()
-    except Exception:
+    except Exception as e:
         db.rollback()
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR, "Couldn't send verification mail."
         )
 
-    return {"msg": "We sent a link to your email, use it to veify your email."}
+    return {"msg": "We sent a link to your email, use it to veify your email.", "task_id": task.id,}
 
 
 @router.get("/verify-email/")
@@ -296,9 +290,6 @@ async def verify_email(
     return {"msg": "Email Verified."}
 
 
-# --- 1. Forgot Password Flow ---
-
-
 @router.post("/forgot-password")
 async def forgot_password(
     request: Request,
@@ -332,14 +323,11 @@ async def forgot_password(
 
         # NOTE: Make sure you have a 'password_reset_mail.html' template
         # Or reuse verification template for now
-        with open("mail_templates/verification_mail.html", "r") as template:
-            asyncio.create_task(
-                utils.send_email(
-                    "Password Reset Request",
-                    recipients=[user.email],
-                    body=template.read().replace("{verification_url}", reset_url),
-                )
-            )
+        start_sending_email.delay(
+            "Password Reset Request",
+            [data.email],
+            reset_url,
+        )
         db.commit()
     except Exception as e:
         db.rollback()
@@ -394,7 +382,9 @@ async def request_email_change(
     verification_token = oauth2.create_token(
         data={
             "sub": current_user.username,
-            "v": db.query(models.User.token_version).filter_by(id=current_user.id).first()[0],
+            "v": db.query(models.User.token_version)
+            .filter_by(id=current_user.id)
+            .first()[0],
             "new_email": data.new_email,
         },
         expires_delta=expires_delta,
@@ -416,17 +406,16 @@ async def request_email_change(
             + f"?token={verification_token}"
         )
 
-        with open("mail_templates/verification_mail.html", "r") as template:
-            asyncio.create_task(
-                utils.send_email(
-                    "Confirm Email Change",
-                    recipients=[data.new_email],
-                    body=template.read().replace("{verification_url}", verify_url),
-                )
-            )
+        start_sending_email.delay(
+            "Confirm Email Change",
+            [data.new_email],
+            verify_url,
+        )
+
         db.commit()
-    except Exception:
+    except Exception as e:
         db.rollback()
+        print(e)
         raise HTTPException(
             status.HTTP_500_INTERNAL_SERVER_ERROR, "Failed to send email."
         )
