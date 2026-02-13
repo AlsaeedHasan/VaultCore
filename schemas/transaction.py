@@ -3,7 +3,7 @@ from decimal import Decimal
 from typing import Optional
 from uuid import UUID
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field
 
 from utils import TransactionStatus, TransactionType
 
@@ -36,5 +36,4 @@ class TransactionResponse(BaseModel):
     reference_id: Optional[str] = None
     description: Optional[str] = None
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
