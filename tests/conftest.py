@@ -8,7 +8,7 @@ from sqlalchemy.pool import NullPool
 from utils import hash_password
 from models import User
 
-SQLALCHEMY_DATABASE_URL = "postgresql://saeed:0895@localhost:5432/vaultcore_test"
+SQLALCHEMY_DATABASE_URL = "postgresql://saeed:password@localhost:5432/vaultcore_test"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL, poolclass=NullPool)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
