@@ -238,8 +238,8 @@ Interactive docs at `http://localhost:8000/docs`
 ### Phase 1: Infrastructure
 
 - [x] **Dockerization**: Multi-stage Dockerfile + docker-compose for PostgreSQL
-- [ ] **CI/CD Pipeline**: GitHub Actions for automated testing & deployment
-- [ ] **Unit & Integration Tests**: Pytest test suite with 80%+ coverage
+- [x] **CI/CD Pipeline**: GitHub Actions for automated testing
+- [x] **Unit & Integration Tests**: Pytest test suite
 - [ ] **API Rate Limiting**: Redis-based throttling (100 req/min per user)
 
 ### Phase 2: Features
