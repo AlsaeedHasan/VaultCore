@@ -1,3 +1,4 @@
+from decimal import Decimal
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict
@@ -10,6 +11,7 @@ class Wallet(BaseModel):
     user_id: UUID
     currency: utils.CurrencyEnum
     is_active: bool
+    balance: Decimal
 
 
 class WalletCreate(BaseModel):
