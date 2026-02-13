@@ -8,11 +8,11 @@ from pydantic import EmailStr
 load_dotenv()
 
 conf = ConnectionConfig(
-    MAIL_USERNAME=getenv("MAIL_USERNAME"),
-    MAIL_PASSWORD=getenv("MAIL_PASSWORD"),
-    MAIL_FROM=getenv("MAIL_FROM"),
-    MAIL_PORT=getenv("MAIL_PORT"),
-    MAIL_SERVER=getenv("MAIL_SERVER", 587),
+    MAIL_USERNAME=getenv("MAIL_USERNAME", "email@compancy.com"),
+    MAIL_PASSWORD=getenv("MAIL_PASSWORD", "app_password"),
+    MAIL_FROM=getenv("MAIL_FROM", "email@compancy.com"),
+    MAIL_PORT=getenv("MAIL_PORT", 587),
+    MAIL_SERVER=getenv("MAIL_SERVER", "smtp.gmail.com"),
     MAIL_STARTTLS=True,
     MAIL_SSL_TLS=False,
     USE_CREDENTIALS=True,
